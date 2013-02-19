@@ -4,35 +4,35 @@
 Lists = new Meteor.Collection("lists");
 Todos = new Meteor.Collection("todos");
 
-// ID of currently selected list
-Session.set('list_id', null);
+// ID of currently selected list: Session list_id
 
-// Name of currently selected tag for filtering
-Session.set('tag_filter', null);
+// Name of currently selected tag for filtering: Session tag_filter
 
 // When adding tag to a todo, ID of the todo
-Session.set('editing_addtag', null);
+//Session.set('editing_addtag', null);
 
 // When editing a list name, ID of the list
-Session.set('editing_listname', null);
+//Session.set('editing_listname', null);
 
 // When editing todo text, ID of the todo
-Session.set('editing_itemname', null);
+//Session.set('editing_itemname', null);
 
-// Navigate to the URL for the specified list_id (which in turn will
-// trigger the "Tracking selected list in URL" `page` callback below).
 var setList = function (list_id) {
-  page('/' + list_id);
+  if (Session.get('list_id') !== list_id) {
+    Session.set('list_id', list_id);
+    Session.set('tag_filter', null);
+  }
 };
 
 // Subscribe to 'lists' collection on startup.
 // Select a list once data has arrived.
 Meteor.subscribe('lists', function () {
-  if (!Session.get('list_id')) {
-    var list = Lists.findOne({}, {sort: {name: 1}});
-    if (list)
-      setList(list._id);
-  }
+  // TODO would want to do this after fetching the session...
+  // if (!Session.get('list_id')) {
+  //   var list = Lists.findOne({}, {sort: {name: 1}});
+  //   if (list)
+  //     setList(list._id);
+  // }
 });
 
 // Always be subscribed to the todos for the selected list.
@@ -290,11 +290,4 @@ Template.tag_filter.events({
     else
       Session.set('tag_filter', this.tag);
   }
-});
-
-////////// Tracking selected list in URL //////////
-
-page('/:list_id', function (context) {
-  Session.set("list_id", context.params.list_id);
-  Session.set("tag_filter", null);
 });
